@@ -8,9 +8,11 @@ function App() {
   const [recording, setRecording] = useState(false);
   const [summary, setSummary] = useState(null)
   const [todo, setToDo] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     ws.current = new WebSocket("ws://127.0.0.1:5000/ws");
+    //ws.current = new WebSocket("ws://10.41.61.49:5000/ws");
 
     ws.current.onopen = async () => {
       console.log("WebSocket connected");
@@ -64,6 +66,7 @@ function App() {
         setSummary(data.payload);
         setToDo(data.payload.match(/Todo List:\s*([\s\S]*)/)[1].split("\n"));
         console.log("received summary");
+        setLoading(false);
       }
 
     };
@@ -85,6 +88,7 @@ function App() {
       mediaRecorder.current.stop();
       setRecording(false);
       ws.current.send(JSON.stringify({ type: "Stop" }))
+      setLoading(true);
     }
     else {
       window.location.reload();
@@ -97,6 +101,7 @@ function App() {
       <h2 className="title">Voice AI Summarizer</h2>
       <div className="recording">{recording ? "Call Active" : "Call Ended"}</div>
       <div className="startButton" onClick={handleClick}>{recording ? "Stop" : "Start" }</div>
+      {loading && <div>Loading... </div>}
       <div className="content">
         <div className="subHead">Summary:</div>
         <div className="text">{summary ? summary.match(/Summary:\s*(.*?)\s*Todo List:/s)[1] : "Please end the call to see your summary :)"}</div>
