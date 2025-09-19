@@ -1,38 +1,96 @@
-.App {
-  text-align: center;
-}
+/* App.css */
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+/* Make sure everything is centered and responsive */
+body {
+  font-family: "Inter", "Segoe UI", sans-serif;
+  background: #f8f9fb;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   min-height: 100vh;
+}
+
+/* Main container card */
+.main {
+  background: white;
+  max-width: 600px;
+  width: 90%;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 1rem;
+}
+
+/* Title styling */
+.title {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+/* Recording status */
+.recording {
+  text-align: center;
+  font-weight: 600;
+  color: #555;
+  font-size: 1rem;
+}
+
+/* Start/Stop button */
+.startButton {
+  background: #007bff;
   color: white;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+  user-select: none;
 }
 
-.App-link {
-  color: #61dafb;
+.startButton:hover {
+  background: #0056d2;
+  transform: scale(1.02);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.startButton:active {
+  transform: scale(0.98);
+}
+
+/* Content area */
+.content {
+  background: #f4f6fa;
+  padding: 1rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Section headers */
+.subHead {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: 0.5rem;
+}
+
+/* Summary and todo text */
+.text {
+  background: white;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.95rem;
+  line-height: 1.4rem;
+  color: #444;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+  white-space: pre-wrap;
 }

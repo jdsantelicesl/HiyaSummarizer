@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import "./App.css"
 
 function App() {
   const ws = useRef(null);
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
   const [recording, setRecording] = useState(false);
-  const [summary, setSummary] = useState("Call summary will appear here after it ends :)")
+  const [summary, setSummary] = useState(null)
 
   useEffect(() => {
     ws.current = new WebSocket("ws://127.0.0.1:5000/ws");
@@ -90,11 +91,16 @@ function App() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Voice AI Summarizer</h2>
-      <p>{recording ? "Call Active" : "Call Ended"}</p>
-      <div onClick={handleClick}>{recording ? "Stop" : "Start" }</div>
-      <p>{summary}</p>
+    <div className="main" style={{ padding: 20 }}>
+      <h2 className="title">Voice AI Summarizer</h2>
+      <div className="recording">{recording ? "Call Active" : "Call Ended"}</div>
+      <div className="startButton" onClick={handleClick}>{recording ? "Stop" : "Start" }</div>
+      <div className="content">
+        <div className="subHead">Summary:</div>
+        <div className="text">{summary ? summary.match(/Summary:\s*(.*?)\s*Todo List:/s)[1] : "Please end the call to see your summary :)"}</div>
+        <div className="subHead">ToDo:</div>
+        <div className="text">{summary ? summary.match(/Todo List:\s*([\s\S]*)/)[1] : "Looks like you have plenty of time to enjoy the day :)"}</div>
+      </div>
     </div>
   );
 }
