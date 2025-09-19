@@ -5,6 +5,7 @@ function App() {
   const mediaRecorder = useRef(null);
   const audioChunks = useRef([]);
   const [recording, setRecording] = useState(false);
+  const [summary, setSummary] = useState("Call summary will appear here after it ends :)")
 
   useEffect(() => {
     ws.current = new WebSocket("ws://127.0.0.1:5000/ws");
@@ -28,7 +29,7 @@ function App() {
           };
           reader.readAsDataURL(event.data);
 
-          
+
           audioChunks.current.push(event.data);
           console.log("Chunk sent:", event.data);
         }
@@ -54,7 +55,14 @@ function App() {
     };
 
     ws.current.onmessage = (event) => {
-      console.log("Received:", event.data);
+      const data = JSON.parse(event.data);
+      console.log("Received:", data.type);
+
+      if (data.type == "Summary") {
+        setSummary(data.payload);
+        console.log("received summary");
+      }
+
     };
 
     ws.current.onclose = () => {
@@ -69,10 +77,18 @@ function App() {
     };
   }, []);
 
+  const handleClick = () => {
+    mediaRecorder.current.stop();
+    setRecording(false);
+    ws.current.send(JSON.stringify({type : "Stop"}))
+  }
+
   return (
     <div style={{ padding: 20 }}>
-      <h2>Recording Audio in Chunks</h2>
-      <p>Recording: {recording ? "yes" : "no"}</p>
+      <h2>Voice AI Summarizer</h2>
+      <p>{recording ? "Call Active" : "Call Ended"}</p>
+      <div onClick={handleClick}>Stop</div>
+      <p>{summary}</p>
     </div>
   );
 }
