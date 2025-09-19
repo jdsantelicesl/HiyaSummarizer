@@ -78,16 +78,22 @@ function App() {
   }, []);
 
   const handleClick = () => {
-    mediaRecorder.current.stop();
-    setRecording(false);
-    ws.current.send(JSON.stringify({type : "Stop"}))
+    if (recording) {
+      mediaRecorder.current.stop();
+      setRecording(false);
+      ws.current.send(JSON.stringify({ type: "Stop" }))
+    }
+    else {
+      window.location.reload();
+    }
+
   }
 
   return (
     <div style={{ padding: 20 }}>
       <h2>Voice AI Summarizer</h2>
       <p>{recording ? "Call Active" : "Call Ended"}</p>
-      <div onClick={handleClick}>Stop</div>
+      <div onClick={handleClick}>{recording ? "Stop" : "Start" }</div>
       <p>{summary}</p>
     </div>
   );
