@@ -5,9 +5,9 @@ import base64
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+import textwrap
 
 connected = set()
-transcribed = False
 
 load_dotenv()
 client = OpenAI(
@@ -29,8 +29,26 @@ async def handler(ws):
                         await c.send(json.dumps({"type": "Stop"}))
                 await ws.close(code=1000, reason="Manual closure requested")
                 print("WebSocket closed manually")
-                global transcribed
-                transcribed = True
+
+                with open("chunk.webm", "rb") as audio_file:
+                    transcript = client.audio.transcriptions.create(model="whisper-1", file=audio_file)
+
+                    response = client.chat.completions.create(
+                        model="gpt-4o-mini",
+                        messages=[
+                            {"role": "system", "content": "Give a brief summary of the text provided and create a todo list with action items. Add to the todo list only items that were mentioned, dont speculate."},
+                            {
+                                "role": "user",
+                                "content": transcript.text,
+                            },
+                        ],
+                    )
+                    parsed_response = textwrap.indent(response.choices[0].message.content, "- ")
+                    print(parsed_response)
+
+                if os.path.exists("chunk.webm"):
+                    os.remove("chunk.webm")
+                    
 
             else: 
                 # append to audio to file
@@ -46,17 +64,6 @@ async def handler(ws):
 
     finally:
         connected.remove(ws)
-
-        if transcribed:
-            with open("chunk.webm", "rb") as audio_file:
-                transcript = client.audio.transcriptions.create(model="whisper-1", file=audio_file)
-
-            print(transcript.text)
-
-            if os.path.exists("chunk.webm"):
-                os.remove("chunk.webm")
-                print("File deleted")
-                transcribed = False
 
 async def main():
     async with websockets.serve(handler, "0.0.0.0", 5000):
