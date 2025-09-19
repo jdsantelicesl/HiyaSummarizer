@@ -35,7 +35,7 @@ async def handler(ws):
                             messages=[
                                 {
                                     "role": "system",
-                                    "content": "Give a brief summary of the text provided and create a todo list with action items. Add to the todo list only items that were mentioned, dont speculate.",
+                                    "content": "The text provided is a voice call conversation. Give a brief summary of the text provided and create a todo list with action items. Add to the todo list only items that were mentioned, dont speculate. Provide your answer in the format 'Summary: <summary>. Todo List: <todolist>' if there are no todo items, return a fun message for todo list instead. Split to do items with backslash n",
                                 },
                                 {
                                     "role": "user",
