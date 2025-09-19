@@ -14,6 +14,8 @@ client = OpenAI(api_key=os.getenv("openAI_key"))
 
 
 async def handler(ws):
+    if os.path.exists("chunk.webm"):
+        os.remove("chunk.webm")
     connected.add(ws)
     print("Client connected")
     try:
@@ -22,47 +24,49 @@ async def handler(ws):
             print("Received: ", data.get("type"))
 
             if data.get("type") == "Stop":
+                try:
+                    with open("chunk.webm", "rb") as audio_file:
+                        transcript = client.audio.transcriptions.create(
+                            model="whisper-1", file=audio_file
+                        )
 
-                with open("chunk.webm", "rb") as audio_file:
-                    transcript = client.audio.transcriptions.create(
-                        model="whisper-1", file=audio_file
-                    )
+                        response = client.chat.completions.create(
+                            model="gpt-4o-mini",
+                            messages=[
+                                {
+                                    "role": "system",
+                                    "content": "Give a brief summary of the text provided and create a todo list with action items. Add to the todo list only items that were mentioned, dont speculate.",
+                                },
+                                {
+                                    "role": "user",
+                                    "content": transcript.text,
+                                },
+                            ],
+                        )
+                        parsed_response = textwrap.indent(
+                            response.choices[0].message.content, "- "
+                        )
+                        print(parsed_response)
 
-                    response = client.chat.completions.create(
-                        model="gpt-4o-mini",
-                        messages=[
+                    await ws.send(
+                        json.dumps(
                             {
-                                "role": "system",
-                                "content": "Give a brief summary of the text provided and create a todo list with action items. Add to the todo list only items that were mentioned, dont speculate.",
-                            },
-                            {
-                                "role": "user",
-                                "content": transcript.text,
-                            },
-                        ],
+                                "type": "Summary",
+                                "payload": response.choices[0].message.content,
+                            }
+                        )
                     )
-                    parsed_response = textwrap.indent(
-                        response.choices[0].message.content, "- "
-                    )
-                    print(parsed_response)
 
-                await ws.send(
-                    json.dumps(
-                        {
-                            "type": "Summary",
-                            "payload": response.choices[0].message.content,
-                        }
-                    )
-                )
+                finally:
+                
+                    if os.path.exists("chunk.webm"):
+                        os.remove("chunk.webm")
 
                 for c in connected:
                     if c != ws:
                         await c.send(json.dumps({"type": "Stop"}))
                 await ws.close(code=1000, reason="Manual closure requested")
                 print("WebSocket closed manually")
-
-                if os.path.exists("chunk.webm"):
-                    os.remove("chunk.webm")
 
             else:
                 # append to audio to file
