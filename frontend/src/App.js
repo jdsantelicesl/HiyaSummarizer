@@ -7,6 +7,7 @@ function App() {
   const audioChunks = useRef([]);
   const [recording, setRecording] = useState(false);
   const [summary, setSummary] = useState(null)
+  const [todo, setToDo] = useState(null);
 
   useEffect(() => {
     ws.current = new WebSocket("ws://127.0.0.1:5000/ws");
@@ -61,6 +62,7 @@ function App() {
 
       if (data.type == "Summary") {
         setSummary(data.payload);
+        setToDo(data.payload.match(/Todo List:\s*([\s\S]*)/)[1].split("\n"));
         console.log("received summary");
       }
 
@@ -98,8 +100,10 @@ function App() {
       <div className="content">
         <div className="subHead">Summary:</div>
         <div className="text">{summary ? summary.match(/Summary:\s*(.*?)\s*Todo List:/s)[1] : "Please end the call to see your summary :)"}</div>
-        <div className="subHead">ToDo:</div>
-        <div className="text">{summary ? summary.match(/Todo List:\s*([\s\S]*)/)[1] : "Looks like you have plenty of time to enjoy the day :)"}</div>
+        <div className="subHead">To Do:</div>
+        <div className="text">{summary ? todo.map((line, i) => (
+          <div key={i}>{line}</div>
+        )) : "Looks like you have plenty of time to enjoy the day :)"}</div>
       </div>
     </div>
   );
