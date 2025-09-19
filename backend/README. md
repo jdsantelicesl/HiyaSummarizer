@@ -1,0 +1,7 @@
+## Debug list
+
+- check that it is runnign on lan, run '''ipconfig''' on windows terminal
+- check websocket address on App.js
+- run '''npm start -- --host 0.0.0.0''' for lan access
+- run on edge browser, connect headphones to avoid debug noise.
+- make sure you refresh window before running to avoid an expired socket.
